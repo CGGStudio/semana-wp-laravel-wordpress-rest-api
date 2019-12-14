@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Clean Blog - Start Bootstrap Theme</title>
+    <title>{{ $settings->title }}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="{{ url('assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -20,7 +20,26 @@
 
     <!-- Custom styles for this template -->
     <link href="{{ url('assets/css/clean-blog.min.css') }}" rel="stylesheet">
+    <style>
+        #pagination {
+            justify-content: center;
+            display: flex;
+        }
 
+        #pagination a {
+            padding: 10px;
+            margin: 5px;
+            color: #0085a1;
+            border: 1px solid #0085a1;
+        }
+
+        #pagination span.active {
+            padding: 10px;
+            margin: 5px;
+            background-color: #0085a1 !important;
+            border-color: #0085a1 !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -28,7 +47,7 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
     <div class="container">
-        <a class="navbar-brand" href="index.html">Start Bootstrap</a>
+        <a class="navbar-brand" href="/"> {{ $settings->title }}</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             Menu
             <i class="fas fa-bars"></i>
@@ -52,8 +71,8 @@
         <div class="row">
             <div class="col-lg-8 col-md-10 mx-auto">
                 <div class="site-heading">
-                    <h1>Clean Blog</h1>
-                    <span class="subheading">A Blog Theme by Start Bootstrap</span>
+                    <h1> {{ $settings->title }}</h1>
+                    <span class="subheading">{{ $settings->description }}</span>
                 </div>
             </div>
         </div>
@@ -64,112 +83,83 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
-            <div class="post-preview">
-                <a href="post.html">
-                    <h2 class="post-title">
-                        Man must explore, and this is exploration at its greatest
-                    </h2>
-                    <h3 class="post-subtitle">
-                        Problems look mighty small from 150 miles up
-                    </h3>
-                </a>
-                <p class="post-meta">Posted by
-                    <a href="#">Start Bootstrap</a>
-                    on September 24, 2019</p>
-            </div>
-            <hr>
-            <div class="post-preview">
-                <a href="post.html">
-                    <h2 class="post-title">
-                        I believe every human has a finite number of heartbeats. I don't intend to waste any of mine.
-                    </h2>
-                </a>
-                <p class="post-meta">Posted by
-                    <a href="#">Start Bootstrap</a>
-                    on September 18, 2019</p>
-            </div>
-            <hr>
-            <div class="post-preview">
-                <a href="post.html">
-                    <h2 class="post-title">
-                        Science has not yet mastered prophecy
-                    </h2>
-                    <h3 class="post-subtitle">
-                        We predict too much for the next year and yet far too little for the next ten.
-                    </h3>
-                </a>
-                <p class="post-meta">Posted by
-                    <a href="#">Start Bootstrap</a>
-                    on August 24, 2019</p>
-            </div>
-            <hr>
-            <div class="post-preview">
-                <a href="post.html">
-                    <h2 class="post-title">
-                        Failure is not an option
-                    </h2>
-                    <h3 class="post-subtitle">
-                        Many say exploration is part of our destiny, but it’s actually our duty to future generations.
-                    </h3>
-                </a>
-                <p class="post-meta">Posted by
-                    <a href="#">Start Bootstrap</a>
-                    on July 8, 2019</p>
-            </div>
-            <hr>
-            <!-- Pager -->
-            <div class="clearfix">
-                <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+            @foreach($posts as $post)
+                <div class="post-preview">
+                    <a href="{{ url($post->slug) }}">
+                        <h2 class="post-title">
+                            {{ $post->title->rendered }}
+                        </h2>
+                    </a>
+                    <p class="post-meta">Publicado
+                        @if (isset($post->_embedded->author))
+                            por {{ $post->_embedded->author[0]->name }}
+                        @endif
+                        el {{ \Carbon\Carbon::createFromFormat('Y-m-d\TH:i:s', $post->date_gmt)->setTimezone('Europe/Madrid')->format('d/m/Y') }}
+                    </p>
+                    <p>
+                        {!! $post->content->rendered !!}
+                    </p>
+                </div>
+                <hr>
+        @endforeach
+        <!-- Pager -->
+            <div class="clearfix" id="pagination">
+                @for($i = 1; $i <= $numeroDePaginas; $i++)
+                    @if ($i == $paginaActual)
+                        <span class="active"> {{  $i  }}</span>
+                    @else
+                        <a href="/?page={{$i}}">{{$i}}</a>
+                    @endif
+                @endfor
             </div>
         </div>
     </div>
-</div>
 
-<hr>
+    <hr>
 
-<!-- Footer -->
-<footer>
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto">
-                <ul class="list-inline text-center">
-                    <li class="list-inline-item">
-                        <a href="#">
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto">
+                    <ul class="list-inline text-center">
+                        <li class="list-inline-item">
+                            <a href="#">
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
                   <i class="fab fa-twitter fa-stack-1x fa-inverse"></i>
                 </span>
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="#">
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#">
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
                   <i class="fab fa-facebook-f fa-stack-1x fa-inverse"></i>
                 </span>
-                        </a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="#">
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a href="#">
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
                   <i class="fab fa-github fa-stack-1x fa-inverse"></i>
                 </span>
-                        </a>
-                    </li>
-                </ul>
-                <p class="copyright text-muted">Copyright &copy; Your Website 2019</p>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; Your Website 2019</p>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
-<!-- Bootstrap core JavaScript -->
-<script src="{{ url('assets/vendor/jquery/jquery.min.js') }}"></script>
-<script src="{{ url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script src="{{ url('assets/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-<!-- Custom scripts for this template -->
-<script src="{{ url('assets/js/clean-blog.min.js') }}"></script>
+    <!-- Custom scripts for this template -->
+    <script src="{{ url('assets/js/clean-blog.min.js') }}"></script>
 
 </body>
 
