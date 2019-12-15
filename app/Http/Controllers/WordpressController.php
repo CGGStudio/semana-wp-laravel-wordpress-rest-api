@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,24 @@ class WordpressController extends Controller
         $numeroDePaginas = $this->numeroDePaginas;
         $paginaActual = $this->paginaActual;
         return view('index', compact('menu', 'settings', 'posts', 'numeroDePaginas', 'paginaActual'));
+    }
+
+    public function post($slug) {
+        $menu = $this->getMenu();
+        $settings = $this->getSettings();
+        $post = $this->getPost($slug);
+        $featuredMediaURL = '';
+        $subhead = 'Publicado';
+        if ($post) {
+            if ($post->featured_media !== 0) {
+                $featuredMediaURL = $this->getMediaURL($post->featured_media);
+            }
+            if (isset($post->_embedded->author[0])) {
+                $subhead .= ' por ' . $post->_embedded->author[0]->name;
+            }
+            $subhead .= ' el ' . Carbon::createFromFormat('Y-m-d\TH:i:s', $post->date_gmt)->setTimezone('Europe/Madrid')->format('d/m/Y');
+        }
+        return view('post', compact('menu', 'settings', 'post', 'subhead', 'featuredMediaURL'));
     }
 
     protected function getMenu()
@@ -52,5 +71,26 @@ class WordpressController extends Controller
         $response = $cliente->get($this->url . 'posts?_embed&per_page=5&page=' . $this->paginaActual);
         $this->numeroDePaginas = $response->getHeader('X-WP-TotalPages')[0];
         return json_decode($response->getBody());
+    }
+
+    protected function getPost($slug) {
+        $cliente = new Client();
+        $response = $cliente->get($this->url .'posts?_embed&slug=' . $slug);
+        if (!empty(json_decode($response->getBody()))) {
+            return json_decode($response->getBody())[0];
+        }
+
+        $response = $cliente->get($this->url .'pages?_embed&slug=' . $slug);
+        if (!empty(json_decode($response->getBody()))) {
+            return json_decode($response->getBody())[0];
+        }
+
+        return null;
+    }
+
+    protected function getMediaURL($id) {
+        $cliente = new Client();
+        $response = $cliente->get($this->url . 'media/' . $id);
+        return json_decode($response->getBody())->source_url;
     }
 }

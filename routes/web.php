@@ -12,3 +12,4 @@
 */
 
 Route::get('/', 'WordpressController@index');
+Route::get('/{slug}', 'WordpressController@post');
