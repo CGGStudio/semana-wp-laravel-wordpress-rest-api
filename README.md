@@ -4,6 +4,8 @@ Código fuente del vídeotutorial en el que explico cómo realizar una
 integración entre una aplicación que usa Laravel y WordPress a través de la 
 WordPress REST API.
 
+Puedes ver el vídeo [en este enlace](https://semanawp.com/charla/crear-un-tema-con-laravel-y-wp-rest-api/).
+
 Puedes encontrar más documentación en:
 - [Documentación de Laravel](https://laravel.com/docs/master).
 - [WordPress REST API](https://developer.wordpress.org/rest-api/).
